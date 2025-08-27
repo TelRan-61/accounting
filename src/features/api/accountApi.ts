@@ -12,10 +12,10 @@ export const registerUser = createAsyncThunk(
             },
             body: JSON.stringify(user),
         });
-        if(response.status === 409) {
+        if (response.status === 409) {
             throw new Error(`User ${user.login} already exists`);
         }
-        if(!response.ok) {
+        if (!response.ok) {
             throw new Error(`Something went wrong`);
         }
         const data = await response.json();
@@ -26,5 +26,20 @@ export const registerUser = createAsyncThunk(
 
 export const fetchUser = createAsyncThunk(
     'user/fetch',
-    // TODO Homework endpoint /account/login
+    async (token: string) => {
+        const response = await fetch(`${base_url}/account/login`, {
+            method: 'POST',
+            headers: {
+                Authorization: token,
+            }
+        });
+        if (response.status === 401) {
+            throw new Error(`login or password is incorrect`);
+        }
+        if (!response.ok) {
+            throw new Error(`Something went wrong`);
+        }
+        const data = await response.json();
+        return {user: data, token};
+    }
 )
